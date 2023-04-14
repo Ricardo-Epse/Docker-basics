@@ -1,0 +1,28 @@
+# /app
+#FROM --platform=linux/amd64 node:19.2-alpine3.17
+#FROM --platform=$BUILDPLATFORM node:19.2-alpine3.17
+FROM --platform=linux/amd64 node:19.2-alpine3.17
+
+# cd app
+WORKDIR /app
+
+#Dest /app
+COPY package.json ./
+
+# Instalar las dependencias
+RUN npm install
+
+#Copia todo lo que esta en el proyecto
+COPY . . 
+
+RUN npm run test
+
+#Eliminar archivos y directorios no necesarios. rf -> Recursivo forzado
+RUN rm -rf tests && rm -rf node_modules
+
+RUN npm install --prod
+
+# Comando run de la imagen
+CMD [ "node" , "app.js" ]
+
+#docker buildx build --platform linux/amd64, linux/arm64 , linux/arm/v7 -t ricardoepse/cron-ticket:latest --push .
